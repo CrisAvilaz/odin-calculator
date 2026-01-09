@@ -1,8 +1,13 @@
-// Operadores válidos
+// Estado da calculadora
 
-const VALID_OPERATORS = Object.freeze(["+", "-", "/", "*"]);
+calculator = {
+    firstNumber: null,
+    secondNumber: null,
+    operator: null,
+    shouldResetDisplay: false
+}
 
-// funções básicas, soma, subtração, divisão e multiplicação.
+// Funções básicas
 
 function add(a, b){
         return a + b;
@@ -20,7 +25,8 @@ function divide(a, b){
         return a / b;
 }
 
-// função validadora
+// Valida os inputs do usuário
+
 const validOperators = Object.freeze(["+", "-", "/", "*"]);
 
 function isValid(firstNumber, operator, secondNumber){
@@ -46,19 +52,74 @@ function isValid(firstNumber, operator, secondNumber){
 }
 
 
-//soma os numeros "=" operate()
+// Opera os inputs validados
 
-function operate(firstNumber, operator, secondNumber){
+function operate(firstNumber, secondNumber, operator){
+
+    const operations = {
+        "+": add,
+        "-": substract,
+        "*": multiply,
+        "/": divide
+    }
+
+    if(!isValid(firstNumber, operator, secondNumber)) return "Error";
+
+    return operations[operator](
+        Number(firstNumber),
+        Number(secondNumber)
+    );
+}
+
+// Listeners de inputs
+
+function handleNumberClick(digit){
+    
+    if (shouldResetDisplay){
+        updateDisplay(digit);
+        shouldResetDisplay = false;
+    } else {
+        updateDisplay(display.textContent + digit);
+    }
+
+    if (operator === null){
+       firstNumber = display.textContent;
+    }
+    else {
+        secondNumber = display.textContent;
+    }
     
 }
 
+function handleOperatorClick(op){
 
-// Calculadora recebe um numero firstNumber
+    if (operator !== null && secondNumber !== null){
+        const result = operate(firstNumber, secondNumber, operator)
+        updateDisplay(result);
+        firstNumber = result;
+        secondNumber = null;
+    }
 
-// recebe um operador curentOperator
+        operator = op;
+        shouldResetDisplay = true;
+}
 
-// recebe outro numero secondNumber
+function handleEquals(){
+    if (!isValid(firstNumber, secondNumber, operator)) return;
 
+        const result = operate(firstNumber, secondNumber, operator);
+        updateDisplay(result);
 
+        firstNumber = result;
+        secondNumber = null;
+        operator = null;
+        shouldResetDisplay = true;
+}
 
-
+function handleClear(){
+        firstNumber = null;
+        secondNumber = null;
+        operator = null;
+        shouldResetDisplay = true;
+        updateDisplay("0");
+}
