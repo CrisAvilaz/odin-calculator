@@ -29,15 +29,13 @@ function divide(a, b){
 
 const validOperators = Object.freeze(["+", "-", "/", "*"]);
 
-function isValid(firstNumber, operator, secondNumber){
+function isValid(){
 
-    if (firstNumber === null ||
-        firstNumber === undefined ||
-        firstNumber === "") return false;
+    const {firstNumber, operator, secondNumber} = calculator;
+
+    if (firstNumber === null || firstNumber === "") return false;
     
-    if (secondNumber === null ||
-        secondNumber === undefined ||
-        secondNumber === "") return false;
+    if (secondNumber === null || secondNumber === "") return false;
 
     if (!validOperators.includes(operator)) return false;
 
@@ -54,7 +52,9 @@ function isValid(firstNumber, operator, secondNumber){
 
 // Opera os inputs validados
 
-function operate(firstNumber, secondNumber, operator){
+function operate(){
+
+    const {firstNumber, operator, secondNumber} = calculator;
 
     const operations = {
         "+": add,
@@ -63,7 +63,7 @@ function operate(firstNumber, secondNumber, operator){
         "/": divide
     }
 
-    if(!isValid(firstNumber, operator, secondNumber)) return "Error";
+    if(!isValid()) return "Error";
 
     return operations[operator](
         Number(firstNumber),
@@ -75,51 +75,52 @@ function operate(firstNumber, secondNumber, operator){
 
 function handleNumberClick(digit){
     
-    if (shouldResetDisplay){
+    if (calculator.shouldResetDisplay){
         updateDisplay(digit);
-        shouldResetDisplay = false;
+        calculator.shouldResetDisplay = false;
     } else {
         updateDisplay(display.textContent + digit);
     }
 
-    if (operator === null){
-       firstNumber = display.textContent;
+    if (calculator.operator === null){
+        calculator.firstNumber = display.textContent;
+    } else {
+        calculator.secondNumber = display.textContent;
     }
-    else {
-        secondNumber = display.textContent;
-    }
-    
 }
 
 function handleOperatorClick(op){
 
-    if (operator !== null && secondNumber !== null){
-        const result = operate(firstNumber, secondNumber, operator)
+    if (calculator.operator !== null && calculator.secondNumber !== null){
+        const result = operate();
+        
+        calculator.firstNumber = result;
+        calculator.secondNumber = null;
         updateDisplay(result);
-        firstNumber = result;
-        secondNumber = null;
     }
 
-        operator = op;
-        shouldResetDisplay = true;
+        calculator.operator = op;
+        calculator.shouldResetDisplay = true;
 }
 
 function handleEquals(){
-    if (!isValid(firstNumber, secondNumber, operator)) return;
 
-        const result = operate(firstNumber, secondNumber, operator);
+    if (!isValid()) return;
+
+        const result = operate();
         updateDisplay(result);
 
-        firstNumber = result;
-        secondNumber = null;
-        operator = null;
-        shouldResetDisplay = true;
+        calculator.firstNumber = result;
+        calculator.secondNumber = null;
+        calculator.operator = null;
+        calculator.shouldResetDisplay = true;
 }
 
 function handleClear(){
-        firstNumber = null;
-        secondNumber = null;
-        operator = null;
-        shouldResetDisplay = true;
+
+        calculator.firstNumber = null;
+        calculator.secondNumber = null;
+        calculator.operator = null;
+        calculator.shouldResetDisplay = true;
         updateDisplay("0");
 }
