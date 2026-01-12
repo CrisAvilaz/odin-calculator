@@ -11,7 +11,15 @@ const display = document.querySelector(".display");
 const buttons = document.querySelector(".buttons");
 
 function updateDisplay(value) {
-    display.textContent = value;
+    display.textContent = String(value);
+}
+
+function formatResult(value){
+    if (!Number.isFinite(value)) return "Error";
+
+    if (Number.isInteger(value)) return value;
+
+    return Math.round(value * 1000) / 1000;
 }
 
 //integração
@@ -99,10 +107,12 @@ function operate(){
 
     if(!isValid()) return "Error";
 
-    return operations[operator](
+    const result = operations[operator](
         Number(firstNumber),
         Number(secondNumber)
     );
+
+    return formatResult(result);
 }
 
 // Listeners de inputs
