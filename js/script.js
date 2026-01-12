@@ -1,4 +1,4 @@
-// Estado da calculadora
+// Escopo Global
 
 calculator = {
     firstNumber: null,
@@ -6,6 +6,40 @@ calculator = {
     operator: null,
     shouldResetDisplay: false
 }
+
+const display = document.querySelector(".display");
+const buttons = document.querySelector(".buttons");
+
+function updateDisplay(value) {
+    display.textContent = value;
+}
+
+//integração
+
+buttons.addEventListener("click", (event) => {
+    const button = event.target;
+
+    if (button.tagName !== "BUTTON") return;
+
+    const value = button.textContent;
+
+        if (value === "AC"){
+        handleClear();
+        return;
+    }
+
+        if (button.classList.contains("equals")){
+        handleEquals();
+        return;
+    }
+
+    if (button.classList.contains("operator")){
+        handleOperatorClick(value);
+        return;
+    }
+
+    handleNumberClick(value);
+});
 
 // Funções básicas
 
@@ -74,22 +108,41 @@ function operate(){
 // Listeners de inputs
 
 function handleNumberClick(digit){
-    
-    if (calculator.shouldResetDisplay){
-        updateDisplay(digit);
-        calculator.shouldResetDisplay = false;
-    } else {
-        updateDisplay(display.textContent + digit);
-    }
+    const currentValue = display.textContent;
 
-    if (calculator.operator === null){
-        calculator.firstNumber = display.textContent;
-    } else {
-        calculator.secondNumber = display.textContent;
-    }
+    // numeros decimais
+    if (digit === "."){
+        if (currentValue.includes(".")) return;
+
+        if (currentValue === "0" || calculator.shouldResetDisplay) {
+            updateDisplay ("0.");
+            calculator.shouldResetDisplay = false;
+        } else {
+            updateDisplay(currentValue + ".");
+        }
+        // numeros normais
+        } else {
+            if (calculator.shouldResetDisplay){
+                updateDisplay(digit);
+                calculator.shouldResetDisplay = false;
+            } else if (display.textContent === "0") {
+                    updateDisplay(digit);
+            } else {
+                    updateDisplay(currentValue + digit);
+            }
+        }
+
+        // atualiza o estado global
+        if (calculator.operator === null){
+          calculator.firstNumber = display.textContent;
+        } else {
+          calculator.secondNumber = display.textContent;
+        }
 }
 
 function handleOperatorClick(op){
+    if (op === "×") op = "*";
+    if (op === "÷") op = "/";
 
     if (calculator.operator !== null && calculator.secondNumber !== null){
         const result = operate();
