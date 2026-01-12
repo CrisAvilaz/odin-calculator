@@ -1,6 +1,6 @@
 // Escopo Global
 
-calculator = {
+const calculator = {
     firstNumber: null,
     secondNumber: null,
     operator: null,
@@ -25,12 +25,12 @@ function divide(a, b){
         return a / b;
 }
 
-const operations = {
+const operations = Object.freeze({
        "+": add,
        "-": substract,
        "*": multiply,
        "/": divide
-   }
+});
 
 // elementos DOOM
 const display = document.querySelector(".display");
@@ -49,32 +49,31 @@ function formatResult(value){
     return Math.round(value * 1000) / 1000;
 }
 
+// animação
+
+function animateKey(key){
+    const button = document.querySelector(`button[data-key="${key}"]`);
+    if (!button) return;
+
+    button.classList.add("pressed");
+    setTimeout(() => button.classList.remove("pressed"), 80);
+}
 
 //integração
 
 buttons.addEventListener("click", (event) => {
     const button = event.target;
-
     if (button.tagName !== "BUTTON") return;
 
-    const value = button.textContent;
+    const key = button.dataset.key;
+    animateKey(key);
 
-        if (value === "AC"){
-        handleClear();
-        return;
-    }
-
-        if (button.classList.contains("equals")){
-        handleEquals();
-        return;
-    }
-
-    if (button.classList.contains("operator")){
-        handleOperatorClick(value);
-        return;
-    }
-
-    handleNumberClick(value);
+        if (key in operations) return handleOperatorClick(key);
+        if ( key === "=") return handleEquals();
+        if (key === "Backspace") return handleBackspace();
+        if (key === "Escape") return handleClear();
+        
+        handleNumberClick(key);
 });
 
 
@@ -97,8 +96,6 @@ function isValid(){
 
     if (Number.isNaN(a) || Number.isNaN(b)) return false;
 
-    if (operator === "/" && b === 0) return false;
-
     return true;
 }
 
@@ -109,13 +106,16 @@ function operate(){
 
     const {firstNumber, operator, secondNumber} = calculator;
 
-    if(!isValid()) return "Error";
+    if (!isValid()) return "Error";
 
-    const result = operations[operator](
-        Number(firstNumber),
-        Number(secondNumber)
-    );
+    const a = Number(firstNumber);
+    const b = Number(secondNumber);
 
+    if (operator === "/" && b === 0 ) {
+        calculator.shouldResetDisplay = true;
+        return "not so smart 😅";
+    }
+    const result = operations[operator](a, b);
     return formatResult(result);
 }
 
@@ -194,32 +194,28 @@ function handleClear(){
 
 function handleKeyPress(event){
     const key = event.key;
+    animateKey(key);
 
     if (key >= "0" && key <= "9"){
         handleNumberClick(key);
         return;
     }
-
     if (key === "."){
         handleNumberClick(".");
         return;
     }
-
     if (key in operations){
         handleOperatorClick(key);
         return;
     }
-
     if (key === "Enter" || key === "="){
         handleEquals();
         return;
     }
-
     if (key === "Escape"){
         handleClear();
         return;
     }
-    
     if (key === "Backspace"){
         handleBackspace();
         return;
@@ -244,4 +240,5 @@ function handleBackspace(){
 }
 
 document.addEventListener("keydown", handleKeyPress);
+ 
 

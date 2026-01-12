@@ -42,11 +42,17 @@ body {
     border-radius: 6px;
     cursor: pointer;
     background: #e0e0e0;
+    transition: transform 0.08s ease, background-color 0.08s ease;
+}
+
+.buttons button.pressed {
+    transform: scale(0.95);
+    background-color: #cfcfcf;
 }
 
 .buttons .equals {
     grid-column: 4;
-    grid-row: 2 / span 4;
+    grid-row: 3 / span 3;
     background-color: #ff8c5a;
     color: #fff;
 }
