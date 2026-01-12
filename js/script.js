@@ -7,8 +7,35 @@ calculator = {
     shouldResetDisplay: false
 }
 
+// Funções básicas
+
+function add(a, b){
+        return a + b;
+}
+
+function substract(a, b){
+        return a - b;
+}
+
+function multiply(a, b){
+        return a * b;
+}
+
+function divide(a, b){
+        return a / b;
+}
+
+const operations = {
+       "+": add,
+       "-": substract,
+       "*": multiply,
+       "/": divide
+   }
+
+// elementos DOOM
 const display = document.querySelector(".display");
 const buttons = document.querySelector(".buttons");
+
 
 function updateDisplay(value) {
     display.textContent = String(value);
@@ -21,6 +48,7 @@ function formatResult(value){
 
     return Math.round(value * 1000) / 1000;
 }
+
 
 //integração
 
@@ -49,23 +77,6 @@ buttons.addEventListener("click", (event) => {
     handleNumberClick(value);
 });
 
-// Funções básicas
-
-function add(a, b){
-        return a + b;
-}
-
-function substract(a, b){
-        return a - b;
-}
-
-function multiply(a, b){
-        return a * b;
-}
-
-function divide(a, b){
-        return a / b;
-}
 
 // Valida os inputs do usuário
 
@@ -97,13 +108,6 @@ function isValid(){
 function operate(){
 
     const {firstNumber, operator, secondNumber} = calculator;
-
-    const operations = {
-        "+": add,
-        "-": substract,
-        "*": multiply,
-        "/": divide
-    }
 
     if(!isValid()) return "Error";
 
@@ -187,3 +191,57 @@ function handleClear(){
         calculator.shouldResetDisplay = true;
         updateDisplay("0");
 }
+
+function handleKeyPress(event){
+    const key = event.key;
+
+    if (key >= "0" && key <= "9"){
+        handleNumberClick(key);
+        return;
+    }
+
+    if (key === "."){
+        handleNumberClick(".");
+        return;
+    }
+
+    if (key in operations){
+        handleOperatorClick(key);
+        return;
+    }
+
+    if (key === "Enter" || key === "="){
+        handleEquals();
+        return;
+    }
+
+    if (key === "Escape"){
+        handleClear();
+        return;
+    }
+    
+    if (key === "Backspace"){
+        handleBackspace();
+        return;
+    }                                                                                                                                                                   
+}
+
+function handleBackspace(){
+    if(calculator.shouldResetDisplay) return;
+
+    let currentValue = display.textContent;
+
+    if (currentValue.length === 1){
+        updateDisplay("0");
+    } else {
+        updateDisplay(currentValue.slice(0, -1));
+    }
+    if (calculator.operator === null) {
+        calculator.firstNumber = display.textContent;
+    } else {
+        calculator.secondNumber = display.textContent;
+    }
+}
+
+document.addEventListener("keydown", handleKeyPress);
+
